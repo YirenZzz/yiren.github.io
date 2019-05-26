@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title><![CDATA[Heapsort]]></title>
+    <url>%2F2019%2F05%2F26%2FHeapsort%2F</url>
+    <content type="text"><![CDATA[Heapsort 堆排序1. 堆堆是一个数组，可以被看成一个近似的完全二叉树。除了最底层外，该树完全充满，从左向右填充。给定一个结点的下标 i，它的父节点、左孩子、右孩子的下标为： ​ Parent(i): return i/2 ​ Left(i): return 2i ​ Right(i): return 2i+1 最大堆：满足A[Parent(i)] &gt;= A[i] ，堆中最大元素存放在根结点中 最小堆：满足A[Parent(i)] &lt;= A[i] ，堆中最小元素存放在根结点中 一般升序用大顶堆，降序用小顶堆 图(a)是最大堆 图(b)数组上方和下方的连线显示的是父-子关系 堆中的节点的高度就是该结点到叶结点最长简单路径上边的数目。 例如，图(a)中树的高度为3 下标为4(值为8)的结点高度为1 父结点总是在孩子结点的左边 *一个包含n个元素的数组可以看作是一颗完全二叉树，那么该堆堆高度是Θ(lgn)。 堆结构上的一些基本操作的运行时间至多与树的高度成正比，即时间复杂度为O(lgn)。* 2. 维护堆的性质 MAX-Heapify：其时间复杂度为O(lgn)，是维护最大堆性质的关键。 通过让A[i]的值在最大堆中”逐级下降”，从而使得以下标 i 为根结点的子树重新遵循最大堆的性质。 MAX-HEAPIFY (A,i)。 思路： 从A[i]、A[LEFT(i)]、A[RIGHT(i)]中选出最大的，并将其index储存在largest中； 如果A[i]是最大的，那么以 i 为根结点的子树已经是最大堆，程序结束； 否则，最大元素是 i 的某个孩子结点，则交换A[i]和A[largest]的值； 交换后，index为largest的结点的值是原来的A[i]，于是以该结点为根的子树又有可能会违反最大堆的性质； 因此，对该子树递归调用MAX-HEAPIFY funciton // PseudocodeMAX-HEAPIFY(A,i) l=LEFT(i) r=RIGHT(i) **if** l&lt;=A.heap-size and A[l]&gt;A[i] largest=l **else** largest=i **if** r&lt;=A.heap-size and A[r]&gt;A[largest] largest=r **if** largest !=r exchange A[i] with A[largest] **MAX-HEAPIFY(A, largest)** 对于一棵以i为根结点、大小为n的子树，MAX-HEAPIFY的时间代价包括: 调整A[i]、A[LEFT(i)]和A[RIGHT(i)]的关系的时间代价Θ(1)，加上在一棵以 i 的一个孩子为根结点的子树上运行MAX-HEAPIFY的时间代价(这里假设递归调用会发生)。 因为每个孩子的子树的大小至多为2n/3(最坏情况发生在树的最底层恰好半满的时候)，我们可以用下面这个递归式刻画MAX-HEAPIFY的运行时间: T(n)≤T(2n/3) + Θ(1) 上述递归式的解为T(n)=O(lgn)。也就是说，对于一个树高为h的结点来说，MAX-HEAPIFY的时间复杂度是O(h) 3. 建堆 BUILD-MAX-HEAP过程：具有线性时间的复杂度O(n)，功能是从无序的输入数据数组中构造一个最大堆。 第一个非叶子结点：length/2-1 思路： 每个叶结点都可以看成只包含一个元素的堆。 BUILD-MAX-HEAP过程对树中的非叶结点都调用一次MAX-HEAPIFY // Pseudocode BUILD-MAX-HEAP(A) ​ A.heap-size=A.length ​ for i = [A.length/2] downto 1 ​ MAX-HEAPIFY(A, i) 4. 堆排序算法 HEAPSORT过程：其时间复杂度为O(nlgn)，功能是对一个数组进行原址排序。 思路： 初始时候，堆排序算法利用BUILD-MAX- HEAP将输人数组A[1..n]建成最大堆，其中n=A. length； 由于数组中的最大元素总在根结点A[1]中，通过把它与A[n]进行互换，使该元素放到正确的位置； 这时候，如果从堆中去掉结点n(这一操作可以通过减少A. heap-size的值来实现)，剩余的结点中，原来根的孩子结点仍然是最大堆，而新的根结点可能会违背最大堆的性质； 为了维护最大堆的性质，调用MAX-HEAPIFY(A, 1)，从而在A[1…n-1]上构造一个新的最大堆； 堆排序算法会不断重复这一过程，直到堆的大小从n-1降到2。 // Pseudocode HEAPSORT(A) ​ BUILD-MAX-HEAP(A) ​ for i = A.length downto 2 ​ exchange A[1] with A[i] ​ A.heap-size = A.heap-size - 1 ​ MAX-HEAPIFY(A, i) ——————————————————-Code——————————————————- 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354//Reference: code from baidubaikevoid swap(int *a, int *b)&#123; int temp=*b; *b=*a; *a=temp;&#125;void max_heapify(int arr[], int start, int end)&#123; int dad=start; int son=dad*2+1; //若子节点指标在范围内才做比较 while(son&lt;=end)&#123; //先比较两个子节点大小，选择最大的 if(son+1&lt;=end &amp;&amp; arr[son]&lt;arr[son+1])&#123; son+=1; &#125; //如果父节点大於子节点代表调整完毕，直接跳出函数 if(arr[dad]&gt;arr[son])&#123; return; &#125; //否则交换父子内容再继续子节点和孙节点比较 else&#123; swap(&amp;arr[dad], &amp;arr[son]); dad=son; son=dad*2+1; &#125; &#125;&#125;void heap_sort(int arr[], int len)&#123; int i; //初始化，i从最後一个父节点开始调整 //第一个非叶子结点：length/2-1 for (i=len/2-1; i&gt;=0; i--)&#123; max_heapify(arr,i,len-1); &#125; //先将第一个元素和已排好元素前一位做交换，再重新调整，直到排序完毕 for (i=len-1;i&gt;0;i--)&#123; swap(&amp;arr[0], &amp;arr[i]); max_heapify(arr,0,i-1); &#125;&#125;int main() &#123; int arr[] = &#123; 3, 5, 3, 0, 8, 6, 1, 5, 8, 6, 2, 4, 9, 4, 7, 0, 1, 8, 9, 7, 3, 1, 2, 5, 9, 7, 4, 0, 2, 6 &#125;; int len = (int) sizeof(arr) / sizeof(*arr); heap_sort(arr, len); int i; for (i = 0; i &lt; len; i++) printf("%d ", arr[i]); printf("\n"); return 0;&#125;]]></content>
+      <categories>
+        <category>Algorithms</category>
+      </categories>
+      <tags>
+        <tag>Note</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Introduction]]></title>
+    <url>%2F2019%2F05%2F25%2FIntroduction%2F</url>
+    <content type="text"><![CDATA[just for testing]]></content>
+  </entry>
+  <entry>
+    <title><![CDATA[Hello World]]></title>
+    <url>%2F2019%2F05%2F25%2Fhello-world%2F</url>
+    <content type="text"><![CDATA[Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new "My New Post" More info: Writing Run server1$ hexo server More info: Server Generate static files1$ hexo generate More info: Generating Deploy to remote sites1$ hexo deploy More info: Deployment]]></content>
+  </entry>
+</search>
