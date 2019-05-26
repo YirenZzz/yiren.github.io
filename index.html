@@ -398,100 +398,15 @@
       
         
           
-            <h1 id="Heapsort-堆排序"><a href="#Heapsort-堆排序" class="headerlink" title="Heapsort 堆排序"></a>Heapsort 堆排序</h1><h4 id="1-堆"><a href="#1-堆" class="headerlink" title="1. 堆"></a>1. 堆</h4><p>堆是一个数组，可以被看成一个近似的完全二叉树。除了最底层外，该树完全充满，从左向右填充。给定一个结点的下标 i，它的父节点、左孩子、右孩子的下标为：</p>
-<p>​        Parent(i): <strong>return</strong> i/2</p>
-<p>​        Left(i): <strong>return</strong> 2i</p>
-<p>​        Right(i): <strong>return</strong> 2i+1</p>
-<p><strong>最大堆：</strong>满足A[Parent(i)] &gt;= A[i] ，堆中最大元素存放在根结点中</p>
-<p><strong>最小堆：</strong>满足A[Parent(i)] &lt;= A[i] ，堆中最小元素存放在根结点中</p>
-<p><u>一般升序用大顶堆，降序用小顶堆</u></p>
-<p><img src="http://ww1.sinaimg.cn/large/006tNc79ly1g3emhxos9cj30o4086dg9.jpg" alt="Screen Shot 2019-05-26 at 12.48.17 PM"></p>
-<ul>
-<li><p>图(a)是最大堆</p>
-</li>
-<li><p>图(b)数组上方和下方的连线显示的是父-子关系</p>
-</li>
-<li><p>堆中的节点的高度就是该结点到叶结点最长简单路径上边的数目。</p>
-<ul>
-<li>例如，图(a)中树的高度为3</li>
-<li>下标为4(值为8)的结点高度为1</li>
-</ul>
-</li>
-<li><p>父结点总是在孩子结点的左边</p>
-</li>
-</ul>
-<p>  *一个包含n个元素的数组可以看作是一颗完全二叉树，那么该堆堆高度是Θ(lgn)。</p>
-<p>  堆结构上的一些基本操作的运行时间至多与树的高度成正比，即时间复杂度为O(lgn)。*</p>
-<h4 id="2-维护堆的性质"><a href="#2-维护堆的性质" class="headerlink" title="2. 维护堆的性质"></a>2. 维护堆的性质</h4><p>  MAX-Heapify：其时间复杂度为O(lgn)，是维护最大堆性质的关键。</p>
-<p>  通过让A[i]的值在最大堆中”逐级下降”，从而使得以下标 i 为根结点的子树重新遵循最大堆的性质。</p>
-<p>  MAX-HEAPIFY (A,i)。</p>
-<p>  <img src="http://ww3.sinaimg.cn/large/006tNc79ly1g3ey1m2jhkj30te0k676s.jpg" alt="Screen Shot 2019-05-26 at 7.28.21 PM"></p>
-<p>  <strong>思路：</strong></p>
-<ol>
-<li>从A[i]、A[LEFT(i)]、A[RIGHT(i)]中选出最大的，并将其index储存在largest中；</li>
-<li>如果A[i]是最大的，那么以 i 为根结点的子树已经是最大堆，程序结束；</li>
-<li>否则，最大元素是 i 的某个孩子结点，则交换A[i]和A[largest]的值；</li>
-<li>交换后，index为largest的结点的值是原来的A[i]，于是以该结点为根的子树又有可能会违反最大堆的性质；</li>
-<li><p>因此，对该子树递归调用MAX-HEAPIFY funciton</p>
-<blockquote>
-<p>// <u>Pseudocode</u><br><strong>MAX-HEAPIFY(A,i)</strong></p>
-<pre><code>l=LEFT(i)
-r=RIGHT(i)
-**if** l&lt;=A.heap-size and A[l]&gt;A[i]
-        largest=l
-**else** largest=i
-**if** r&lt;=A.heap-size and A[r]&gt;A[largest]
-        largest=r
-**if** largest !=r
-        exchange A[i] with A[largest]
-        **MAX-HEAPIFY(A, largest)**
-</code></pre></blockquote>
-<p>对于一棵以i为根结点、大小为n的子树，<strong>MAX-HEAPIFY的时间代价</strong>包括: 调整A[i]、A[LEFT(i)]和A[RIGHT(i)]的关系的时间代价Θ(1)，加上在一棵以 i 的一个孩子为根结点的子树上运行MAX-HEAPIFY的时间代价(这里假设递归调用会发生)。</p>
-<p>因为每个孩子的子树的大小至多为2n/3(最坏情况发生在树的最底层恰好半满的时候)，我们可以用下面这个递归式刻画MAX-HEAPIFY的运行时间:</p>
-<pre><code>T(n)≤T(2n/3) + Θ(1)
-</code></pre><p>上述递归式的解为T(n)=O(lgn)。也就是说，对于一个树高为h的结点来说，MAX-HEAPIFY的时间复杂度是O(h)</p>
-</li>
-</ol>
-<h4 id="3-建堆"><a href="#3-建堆" class="headerlink" title="3. 建堆"></a>3. 建堆</h4><p>  BUILD-MAX-HEAP过程：具有线性时间的复杂度O(n)，功能是从无序的输入数据数组中构造一个最大堆。</p>
-<p>  <img src="http://ww4.sinaimg.cn/large/006tNc79ly1g3f0alw5ojj30so0v6185.jpg" alt="Screen Shot 2019-05-26 at 8.46.11 PM"></p>
-<p>  <u><strong>第一个非叶子结点：length/2-1</strong></u></p>
-<p>  <strong>思路：</strong></p>
-<ol>
-<li>每个叶结点都可以看成只包含一个元素的堆。</li>
-<li><p>BUILD-MAX-HEAP过程对树中的非叶结点都调用一次MAX-HEAPIFY</p>
-<blockquote>
-<p>// <u>Pseudocode</u></p>
-<p><strong>BUILD-MAX-HEAP(A)</strong></p>
-<p>​    A.heap-size=A.length</p>
-<p>​    <strong>for</strong> i = [A.length/2] <strong>downto</strong> 1</p>
-<p>​            <strong>MAX-HEAPIFY(A, i)</strong></p>
-</blockquote>
-</li>
-</ol>
-<h4 id="4-堆排序算法"><a href="#4-堆排序算法" class="headerlink" title="4. 堆排序算法"></a>4. 堆排序算法</h4><p>  HEAPSORT过程：其时间复杂度为O(nlgn)，功能是对一个数组进行原址排序。</p>
-<p>  <img src="http://ww2.sinaimg.cn/large/006tNc79ly1g3f0gs40jtj30qk0aqab1.jpg" alt="Screen Shot 2019-05-26 at 8.52.35 PM"></p>
-<p>  <img src="http://ww4.sinaimg.cn/large/006tNc79ly1g3f0hceqdej30q00b4aap.jpg" alt="Screen Shot 2019-05-26 at 8.53.17 PM"><img src="http://ww3.sinaimg.cn/large/006tNc79ly1g3f0hlqsy9j30t203aacz.jpg" alt="Screen Shot 2019-05-26 at 8.53.45 PM"></p>
-<p>  <strong>思路：</strong></p>
-<ol>
-<li>初始时候，堆排序算法利用BUILD-MAX- HEAP将输人数组A[1..n]建成最大堆，其中n=A. length；</li>
-<li>由于数组中的最大元素总在根结点A[1]中，通过把它与A[n]进行互换，使<br>该元素放到正确的位置；</li>
-<li>这时候，如果从堆中去掉结点n(这一操作可以通过减少A. heap-size的值来实现)，剩余的结点中，原来根的孩子结点仍然是最大堆，而新的根结点可能会违背最大堆的性质；</li>
-<li>为了维护最大堆的性质，调用MAX-HEAPIFY(A, 1)，从而在A[1…n-1]上构造一个新的最大堆；</li>
-<li><p>堆排序算法会不断重复这一过程，直到堆的大小从n-1降到2。</p>
-<blockquote>
-<p>// <u>Pseudocode</u></p>
-<p><strong>HEAPSORT(A)</strong></p>
-<p>​    <strong>BUILD-MAX-HEAP(A)</strong></p>
-<p>​    <strong>for</strong> i = A.length <strong>downto</strong> 2</p>
-<p>​            exchange A[1] with A[i]</p>
-<p>​            A.heap-size = A.heap-size - 1</p>
-<p>​            <strong>MAX-HEAPIFY(A, i)</strong></p>
-</blockquote>
-</li>
-</ol>
-<h4 id="Code"><a href="#Code" class="headerlink" title="Code"></a>Code</h4>  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Reference: code from baidubaike</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">swap</span><span class="params">(<span class="keyword">int</span> *a, <span class="keyword">int</span> *b)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> temp=*b;</span><br><span class="line">    *b=*a;</span><br><span class="line">    *a=temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">max_heapify</span><span class="params">(<span class="keyword">int</span> arr[], <span class="keyword">int</span> start, <span class="keyword">int</span> end)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> dad=start;</span><br><span class="line">    <span class="keyword">int</span> son=dad*<span class="number">2</span>+<span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//若子节点指标在范围内才做比较</span></span><br><span class="line">    <span class="keyword">while</span>(son&lt;=end)&#123;</span><br><span class="line">        <span class="comment">//先比较两个子节点大小，选择最大的</span></span><br><span class="line">        <span class="keyword">if</span>(son+<span class="number">1</span>&lt;=end &amp;&amp; arr[son]&lt;arr[son+<span class="number">1</span>])&#123;</span><br><span class="line">            son+=<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果父节点大於子节点代表调整完毕，直接跳出函数</span></span><br><span class="line">        <span class="keyword">if</span>(arr[dad]&gt;arr[son])&#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//否则交换父子内容再继续子节点和孙节点比较</span></span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            swap(&amp;arr[dad], &amp;arr[son]);</span><br><span class="line">            dad=son;</span><br><span class="line">            son=dad*<span class="number">2</span>+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">heap_sort</span><span class="params">(<span class="keyword">int</span> arr[], <span class="keyword">int</span> len)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="comment">//初始化，i从最後一个父节点开始调整</span></span><br><span class="line">    <span class="comment">//第一个非叶子结点：length/2-1</span></span><br><span class="line">    <span class="keyword">for</span> (i=len/<span class="number">2</span><span class="number">-1</span>; i&gt;=<span class="number">0</span>; i--)&#123;</span><br><span class="line">        max_heapify(arr,i,len<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//先将第一个元素和已排好元素前一位做交换，再重新调整，直到排序完毕</span></span><br><span class="line">    <span class="keyword">for</span> (i=len<span class="number">-1</span>;i&gt;<span class="number">0</span>;i--)&#123;</span><br><span class="line">        swap(&amp;arr[<span class="number">0</span>], &amp;arr[i]);</span><br><span class="line">        max_heapify(arr,<span class="number">0</span>,i<span class="number">-1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> arr[] = &#123; <span class="number">3</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">8</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">9</span>, <span class="number">7</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">6</span> &#125;;</span><br><span class="line">    <span class="keyword">int</span> len = (<span class="keyword">int</span>) <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(*arr);</span><br><span class="line">    heap_sort(arr, len);</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%d "</span>, arr[i]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-          
+          Heapsort 堆排序1. 堆堆是一个数组，可以被看成一个近似的完全二叉树。除了最底层外，该树完全
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/05/26/Heapsort/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -631,9 +546,16 @@ r=RIGHT(i)
       
         
           
-            <p>Hello, 这里是麓。</p>
+          Hello, 这里是麓。
 
           
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/05/25/Introduction/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -773,17 +695,15 @@ r=RIGHT(i)
       
         
           
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-          
+          Welcome to Hexo! This is your very first post. Che
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/05/25/hello-world/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
